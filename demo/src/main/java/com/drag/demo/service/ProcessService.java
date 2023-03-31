@@ -88,16 +88,22 @@ public class ProcessService {
         return scheduleRepository.save(schedule);
     }
 
-//    public OrderProcess updateOrderProcess(Long id, OrderProcessCreationRequest request) {
-//        Optional<OrderProcess> optionalOrderProcess = orderProcessRepository.findById(id);
-//        if (!optionalOrderProcess.isPresent()) {
-//            throw new EntityNotFoundException(
-//                    "OrderProcess not present in the database");
-//        }
-//
-//        OrderProcess orderProcess = optionalOrderProcess.get();
-//        orderProcess.set
-//        return orderProcessRepository.save(member);
-//    }
+    public OrderProcess updateOrderProcess(Long id, OrderProcessCreationRequest request) {
+        Optional<OrderProcess> optionalOrderProcess = orderProcessRepository.findById(id);
+        if (!optionalOrderProcess.isPresent()) {
+            throw new EntityNotFoundException(
+                    "OrderProcess not present in the database");
+        }
+
+        OrderProcess orderProcess = optionalOrderProcess.get();
+
+        Product newProduct = productRepository.findById(request.getP_id()).orElseThrow(() -> new EntityNotFoundException());
+        Process newProcess = processRepository.findById(request.getPc_id()).orElseThrow(() -> new EntityNotFoundException());
+
+        orderProcess.setProduct(newProduct);
+        orderProcess.setProcess(newProcess);
+
+        return orderProcessRepository.save(orderProcess);
+    }
 }
 
