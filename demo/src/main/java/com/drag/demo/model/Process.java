@@ -19,5 +19,5 @@ public class Process {
     private String category;
     @JsonBackReference
     @OneToMany(mappedBy = "process", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Product> products;
+    private List<OrderProcess> orderProcesses;
 }

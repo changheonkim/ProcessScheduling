@@ -13,7 +13,6 @@ public class Schedule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private long pcm_id;
     private java.sql.Date schedule;
 
     @ManyToOne

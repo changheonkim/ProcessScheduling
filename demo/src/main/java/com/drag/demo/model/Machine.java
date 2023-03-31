@@ -23,6 +23,10 @@ public class Machine {
     @JsonManagedReference
     private Product product;
 
+    @ManyToOne
+    @JoinColumn(name = "o_id")
+    @JsonManagedReference
+    private OrderProcess orderProcess;
     @JsonBackReference
     @OneToMany(mappedBy = "machine", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Schedule> schedule;
