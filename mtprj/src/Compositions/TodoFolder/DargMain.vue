@@ -1,22 +1,31 @@
 <template>
   <div class="container">
     <div class="step1">
-      <div class="col-3">
-        <draggable
-          class="list-group"
-          :list="list1"
-          group="people"
-          @change="log"
-          itemKey="name"
-        >
-          <template #item="{ element, index }">
-            <div class="st1-do">{{ element.name }} {{ index }}</div>
-          </template>
-        </draggable>
-      </div>
+      <draggable
+        class="list-group"
+        :list="step1Data"
+        :group="{ name: 'people', pull: 'clone', put: false }"
+        itemKey="name"
+      >
+        <template #item="{ element }">
+          <div class="st1-do">{{ element.job }}</div>
+        </template>
+      </draggable>
     </div>
-
     <div class="step2">
+      <draggable
+        class="list-group"
+        :list="list2"
+        group="people"
+        @change="log"
+        itemKey="name"
+      >
+        <template #item="{ element }">
+          <div class="st1-do">{{ element.job }}</div>
+        </template>
+      </draggable>
+    </div>
+    <div class="step3">
       <div class="cate-border">
         <div :list="categorys">
           <div v-for="element in categorys" :key="element.name" class="layout">
@@ -26,8 +35,8 @@
           </div>
         </div>
       </div>
-      <div :list="list2" class="step2-border">
-        <div v-for="row in list2" :key="row.index" class="layout">
+      <div :list="list3" class="step3-border">
+        <div v-for="row in list3" :key="row.index" class="layout">
           <div>
             <draggable
               :list="row.items"
@@ -36,7 +45,7 @@
               itemKey="name"
             >
               <template #item="{ element }">
-                <div class="st2-do">
+                <div class="st3-do">
                   {{ element.name }}
                 </div>
               </template>
@@ -50,9 +59,28 @@
   
 <script >
 import draggable from "vuedraggable";
+import { computed, onMounted } from "vue";
+import { useStore } from "vuex";
+import { axiosGet } from "../modules/axios.js";
 export default {
   components: {
     draggable,
+  },
+  setup() {
+    const store = useStore();
+    const step1Data = computed(() => store.getters.step1_data);
+
+    onMounted(() => {
+      axiosGet("/process", (data) => {
+        store.dispatch("setStep1Data", data);
+      });
+    });
+    return { step1Data };
+  },
+  methods: {
+    log(evt) {
+      console.log(evt.added.element);
+    },
   },
   data() {
     return {
@@ -64,7 +92,8 @@ export default {
         { name: "Jean", id: 3 },
         { name: "Gerard", id: 4 },
       ],
-      list2: [
+      list2: [],
+      list3: [
         {
           index: 1,
           items: [
@@ -103,23 +132,30 @@ export default {
   height: 100%;
 }
 .step1 {
-  width: 20%;
+  width: 14%;
   height: 72vh;
   margin-top: 1%;
   float: left;
 }
 .step2 {
-  width: 68%;
+  width: 14%;
+  height: 72vh;
+  margin-top: 1%;
+  margin-left: 4%;
+  float: left;
+}
+.step3 {
+  width: 56%;
   height: 72vh;
   margin-top: 1.2%;
-  margin-left: 10%;
+  margin-left: 4%;
   float: left;
 }
 .cate {
   width: 100%;
-  border: 1px solid #6A5ACD;
+  border: 1px solid #6a5acd;
   height: 6%;
-  background-color:	#6A5ACD;
+  background-color: #6a5acd;
   color: white;
   border-radius: 0.8vh;
   cursor: pointer;
@@ -135,7 +171,7 @@ export default {
   float: left;
 }
 
-.step2-border {
+.step3-border {
   width: 76%;
   height: 72vh;
   /* border: 1px solid black; */
@@ -158,7 +194,7 @@ export default {
   margin-top: 4%;
   box-shadow: 0px 1px 4px 0px #c0c0c0;
 }
-.st2-do {
+.st3-do {
   width: 12%;
   border: 1px solid #e8f4ff;
   height: 6%;

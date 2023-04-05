@@ -1,7 +1,6 @@
 <template>
   <div class="todo-list-bar">
     <div class="category">카테고리 추가</div>
-    <input type="date" class="date-choose" />
     <div class="title">Todo <span style="color: #6f00cc">List</span></div>
     <div class="calendar-button">캘린더</div>
   </div>
@@ -13,25 +12,16 @@ export default {};
 
 <style>
 .todo-list-bar {
-  width: 68%;
+  width: 56%;
   height: 6vh;
   margin: 0;
   border: 1px solid #e8f4ff;
   float: left;
-  margin-left: 9%;
+  margin-left: 3%;
   border-radius: 0.8vh 0.8vh 0.8vh 0.8vh;
   background-color: #ebf5ff;
   line-height: 6vh;
   box-shadow: 0px 1px 4px 0px #c0c0c0;
-}
-.date-choose {
-  float: left;
-  margin-left: 2.2%;
-  margin-top: 0.6%;
-  width: 6vw;
-  height: 4vh;
-  border-radius: 1vh;
-  border: 0.5px solid #c0c0c0;
 }
 .category {
   float: left;
@@ -53,7 +43,7 @@ export default {};
   cursor: pointer;
 }
 .title{
-  margin-left: 20%;
+  margin-left: 30%;
   float: left;
   font-family: "Montserrat", sans-serif;
   font-size: 1.2rem;

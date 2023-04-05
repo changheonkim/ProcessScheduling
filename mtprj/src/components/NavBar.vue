@@ -1,7 +1,6 @@
 <template>
   <div class="app-bar">
     <span class="logo">Todo<span style="color: #6f00cc">Drag</span></span>
-    <span class="user">Login</span>
   </div>
 </template>
 
@@ -22,13 +21,6 @@ export default {};
   float: left;
   margin-left: 4%;
   font-size: 1.4rem;
-  font-family: "Montserrat", sans-serif;
-  cursor: pointer;
-}
-.user {
-  float: right;
-  margin-right: 2%;
-  font-size: 1.2rem;
   font-family: "Montserrat", sans-serif;
   cursor: pointer;
 }
