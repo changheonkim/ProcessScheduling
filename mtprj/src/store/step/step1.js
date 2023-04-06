@@ -8,14 +8,14 @@ export const step1 = {
     },
   },
   mutations: {
-    SET_DATA(state, data) {
+    SET_S1DATA(state, data) {
       state.step1 = data;
     },
   },
   actions: {
     setStep1Data: ({ commit }, data) => {
       if (data != null) {
-        commit("SET_DATA", data);
+        commit("SET_S1DATA", data);
       }
     },
   },

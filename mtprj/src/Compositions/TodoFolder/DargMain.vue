@@ -15,13 +15,16 @@
     <div class="step2">
       <draggable
         class="list-group"
-        :list="list2"
+        :list="step2Data"
         group="people"
         @change="log"
-        itemKey="name"
+        itemKey="job"
       >
-        <template #item="{ element }">
-          <div class="st1-do">{{ element.job }}</div>
+        <template #item="{ element, index }">
+          <div class="st2-do">
+            {{ element.job }}
+            <span class="del_button" v-on:click="delStep2(index)">X</span>
+          </div>
         </template>
       </draggable>
     </div>
@@ -66,10 +69,10 @@ export default {
   components: {
     draggable,
   },
-  setup() {
+  props: ["step2Data"],
+  setup(props) {
     const store = useStore();
     const step1Data = computed(() => store.getters.step1_data);
-
     onMounted(() => {
       axiosGet("/process", (data) => {
         store.dispatch("setStep1Data", data);
@@ -81,18 +84,14 @@ export default {
     log(evt) {
       console.log(evt.added.element);
     },
+    delStep2(idx) {
+      this.list2.splice(idx, 1);
+    },
   },
   data() {
     return {
       drag: false,
       categorys: [{ name: "A" }, { name: "B" }, { name: "c" }],
-      list1: [
-        { name: "John", id: 1 },
-        { name: "Joao", id: 2 },
-        { name: "Jean", id: 3 },
-        { name: "Gerard", id: 4 },
-      ],
-      list2: [],
       list3: [
         {
           index: 1,
@@ -127,6 +126,15 @@ export default {
 </script>
 
 <style>
+.del_button {
+  float: right;
+  margin-right: 6%;
+  display: inline;
+}
+.del_button:hover {
+  color: red;
+  font-size: 1.4em;
+}
 .container {
   width: 100%;
   height: 100%;
@@ -134,20 +142,17 @@ export default {
 .step1 {
   width: 14%;
   height: 72vh;
-  margin-top: 1%;
   float: left;
 }
 .step2 {
   width: 14%;
   height: 72vh;
-  margin-top: 1%;
   margin-left: 4%;
   float: left;
 }
 .step3 {
   width: 56%;
   height: 72vh;
-  margin-top: 1.2%;
   margin-left: 4%;
   float: left;
 }
@@ -193,6 +198,18 @@ export default {
   line-height: 4vh;
   margin-top: 4%;
   box-shadow: 0px 1px 4px 0px #c0c0c0;
+}
+.st2-do {
+  width: 100%;
+  border: 1px solid #e8f4ff;
+  height: 6%;
+  background-color: #e8f4ff;
+  border-radius: 0.8vh;
+  cursor: pointer;
+  line-height: 4vh;
+  margin-top: 4%;
+  box-shadow: 0px 1px 4px 0px #c0c0c0;
+  text-align: center;
 }
 .st3-do {
   width: 12%;
