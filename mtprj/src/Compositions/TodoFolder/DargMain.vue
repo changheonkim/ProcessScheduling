@@ -16,12 +16,11 @@
       <draggable
         class="list-group"
         :list="step2Data"
-        group="people"
-        @change="log"
+        :group="{ name: 'people', pull: 'clone' }"
         itemKey="job"
       >
         <template #item="{ element, index }">
-          <div class="st2-do">
+          <div v-if="element.job != null" class="st2-do">
             {{ element.job }}
             <span class="del_button" v-on:click="delStep2(index)">X</span>
           </div>
@@ -30,25 +29,20 @@
     </div>
     <div class="step3">
       <div class="cate-border">
-        <div :list="categorys">
-          <div v-for="element in categorys" :key="element.name" class="layout">
-            <div class="cate">
+        <div :list="category">
+          <div v-for="element in category" :key="element.name" class="layout">
+            <div v-if="element.name != null" class="cate">
               {{ element.name }}
             </div>
           </div>
         </div>
       </div>
-      <div :list="list3" class="step3-border">
-        <div v-for="row in list3" :key="row.index" class="layout">
+      <div :list="step3List" class="step3-border">
+        <div v-for="row in step3List" :key="row.index" class="layout">
           <div>
-            <draggable
-              :list="row.items"
-              group="people"
-              @change="log"
-              itemKey="name"
-            >
+            <draggable :list="row.items" group="people" itemKey="name">
               <template #item="{ element }">
-                <div class="st3-do">
+                <div v-if="element.name != null" class="st3-do">
                   {{ element.name }}
                 </div>
               </template>
@@ -64,62 +58,37 @@
 import draggable from "vuedraggable";
 import { computed, onMounted } from "vue";
 import { useStore } from "vuex";
-import { axiosGet } from "../modules/axios.js";
+import { axiosDelete, axiosGet } from "../modules/axios.js";
 export default {
   components: {
     draggable,
   },
-  props: ["step2Data"],
-  setup(props) {
+  props: ["step2Data", "category", "step3List"],
+  setup() {
     const store = useStore();
     const step1Data = computed(() => store.getters.step1_data);
+
     onMounted(() => {
       axiosGet("/process", (data) => {
         store.dispatch("setStep1Data", data);
       });
     });
+
     return { step1Data };
   },
   methods: {
-    log(evt) {
-      console.log(evt.added.element);
-    },
     delStep2(idx) {
-      this.list2.splice(idx, 1);
+      if (this.step2Data[idx].oid) {
+        axiosDelete(`/orderProcess/${this.step2Data[idx].oid}`);
+        this.step2Data.splice(idx, 1);
+      } else {
+        this.step2Data.splice(idx, 1);
+      }
     },
   },
   data() {
     return {
       drag: false,
-      categorys: [{ name: "A" }, { name: "B" }, { name: "c" }],
-      list3: [
-        {
-          index: 1,
-          items: [
-            { name: "Juan", id: 5 },
-            { name: "Edgard", id: 6 },
-            { name: "Johnson", id: 7 },
-          ],
-        },
-        {
-          index: 2,
-          items: [
-            { name: "Jua1n", id: 5 },
-            { name: "Edgard12323", id: 6 },
-            { name: "Johnson", id: 7 },
-          ],
-        },
-        {
-          index: 3,
-          items: [
-            { name: "Jua1n12", id: 8 },
-            { name: "Edgard12323", id: 9 },
-            { name: "Johnson", id: 10 },
-            { name: "Johnson", id: 11 },
-            { name: "Johnson", id: 12 },
-          ],
-        },
-      ],
     };
   },
 };

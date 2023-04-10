@@ -20,9 +20,18 @@ public class MachineService {
 
     public Machine createMachine(MachineCreationRequest request) {
         Optional<Product> product = productRepository.findById(request.getPc_id());
+
+        Machine machine = new Machine();
         if (!product.isPresent()) {
             throw new EntityNotFoundException(
                     "product Not Found");
+        }
+
+        if (request.getO_id() == null) {
+            BeanUtils.copyProperties(request, machine);
+            machine.setProduct(product.get());
+            machine.setOrderProcess(null);
+            return machineRepository.save(machine);
         }
 
         Optional<OrderProcess> orderProcess = orderProcessRepository.findById(request.getO_id());
@@ -31,7 +40,6 @@ public class MachineService {
                     "process Not Found");
         }
 
-        Machine machine = new Machine();
         BeanUtils.copyProperties(request, machine);
         machine.setProduct(product.get());
         machine.setOrderProcess(orderProcess.get());

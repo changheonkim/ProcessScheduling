@@ -28,24 +28,45 @@ public class OrderProcessService {
     public void deleteOrderProcess(Long id) {
         orderProcessRepository.deleteById(id);
     }
-    public OrderProcess createOrderProcess(OrderProcessCreationRequest request) {
-        Optional<Product> product = productRepository.findById(request.getP_id());
-        if (!product.isPresent()) {
-            throw new EntityNotFoundException(
-                    "product Not Found");
+
+    public OrderProcess createOrderProcess(OrderProcessCreationRequest request, Long id) {
+        if (id == 0) {
+            Optional<Product> product = productRepository.findById(request.getP_id());
+            if (!product.isPresent()) {
+                throw new EntityNotFoundException(
+                        "product Not Found");
+            }
+
+            Optional<Process> process = processRepository.findById(request.getPc_id());
+            if (!process.isPresent()) {
+                throw new EntityNotFoundException(
+                        "process Not Found");
+            }
+
+            OrderProcess orderProcess = new OrderProcess();
+            BeanUtils.copyProperties(request, orderProcess);
+            orderProcess.setProduct(product.get());
+            orderProcess.setProcess(process.get());
+            return orderProcessRepository.save(orderProcess);
+        } else {
+            Optional<OrderProcess> optionalOrderProcess = orderProcessRepository.findById(id);
+            if (!optionalOrderProcess.isPresent()) {
+                throw new EntityNotFoundException(
+                        "OrderProcess not present in the database");
+            }
+
+            OrderProcess orderProcess = optionalOrderProcess.get();
+
+            Product newProduct = productRepository.findById(request.getP_id()).orElseThrow(() -> new EntityNotFoundException());
+            Process newProcess = processRepository.findById(request.getPc_id()).orElseThrow(() -> new EntityNotFoundException());
+
+            orderProcess.setProduct(newProduct);
+            orderProcess.setProcess(newProcess);
+            orderProcess.setIdx(request.getIdx());
+
+            return orderProcessRepository.save(orderProcess);
         }
 
-        Optional<Process> process = processRepository.findById(request.getPc_id());
-        if (!process.isPresent()) {
-            throw new EntityNotFoundException(
-                    "process Not Found");
-        }
-
-        OrderProcess orderProcess = new OrderProcess();
-        BeanUtils.copyProperties(request, orderProcess);
-        orderProcess.setProduct(product.get());
-        orderProcess.setProcess(process.get());
-        return orderProcessRepository.save(orderProcess);
     }
 
 

@@ -16,9 +16,9 @@ public class OrderProcessController {
     private final OrderProcessService orderProcessService;
 
 
-    @PostMapping("")
-    public ResponseEntity<OrderProcess> createOrderProcess(@RequestBody OrderProcessCreationRequest request) {
-        return ResponseEntity.ok(orderProcessService.createOrderProcess(request));
+    @PostMapping("/{Id}")
+    public ResponseEntity<OrderProcess> createOrderProcess(@RequestBody OrderProcessCreationRequest request,  @PathVariable Long Id) {
+        return ResponseEntity.ok(orderProcessService.createOrderProcess(request, Id));
     }
 
     @PatchMapping("/{Id}")

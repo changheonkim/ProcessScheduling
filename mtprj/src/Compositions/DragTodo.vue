@@ -14,7 +14,7 @@
       <div class="input-button" v-on:click="getStep2">입력</div>
     </div>
     <div class="save-container">
-      <div class="save-todo">공정 저장</div>
+      <div class="save-todo" v-on:click="saveStep2">공정 저장</div>
     </div>
     <div class="todo-list-bar">
       <div class="category">카테고리 추가</div>
@@ -22,14 +22,20 @@
       <div class="calendar-button">캘린더</div>
     </div>
   </div>
-  <div v-if="step2Data != null"><DargMainVue :step2Data="step2Data" /></div>
+  <div v-if="step2Data != null">
+    <DargMainVue
+      :step2Data="step2Data"
+      :category="category"
+      :step3List="step3List"
+    />
+  </div>
 </template>
 
 <script>
 import DargMainVue from "./TodoFolder/DargMain.vue";
-import { computed, onMounted, watch, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useStore } from "vuex";
-import { axiosGet } from "./modules/axios.js";
+import { axiosGet, axiosPost } from "./modules/axios.js";
 export default {
   components: {
     DargMainVue,
@@ -39,15 +45,16 @@ export default {
       com: "",
       pro: "",
       proList: [],
-      step2List: [],
+      category: [],
+      step3List: [],
     };
   },
   setup() {
     const store = useStore();
     const company = computed(() => store.getters.company);
     const product = computed(() => store.getters.product);
-    const step2Data = ref(computed(() => store.getters.step2_data));
 
+    var step2Data = ref(computed(() => store.getters.step2_data));
     onMounted(() => {
       axiosGet("/company", (data) => {
         store.dispatch("setCompanyData", data);
@@ -71,14 +78,62 @@ export default {
     },
     getStep2() {
       if (this.com != "" && this.pro != "") {
-        let url = "/orderProcess/" + this.com + "/" + this.pro;
+        let url = "/orderProcess/" + this.pro + "/" + this.com;
+        console.log("pro:" + this.pro, this.com);
         axiosGet(url, (data) => {
+          this.category = [];
+          this.step3List = [];
+
+          let mnames = new Set();
+          data.forEach((element) => {
+            mnames.add(element.mname);
+          });
+
+          let idx = 0;
+          mnames.forEach((mn) => {
+            idx++;
+
+            let step3 = {};
+            step3.index = idx;
+            step3.name = mn;
+            step3.items = [];
+            this.step3List.push(step3);
+
+            let obj = {};
+            obj.name = mn;
+            this.category.push(obj);
+          });
+
+          data.forEach((element) => {
+            let idx = 0;
+            this.step3List.forEach((list) => {
+              let obj = {};
+              if (element.mname == list.name && element.mname != null) {
+                obj.name = element.job;
+                this.step3List[idx].items.push(obj);
+              }
+              idx++;
+            });
+          });
+
+          this.Step2Data = [];
           console.log(data);
           this.store.dispatch("setStep2Data", data);
         });
       } else {
         alert("회사와 제품을 선택하세요!");
       }
+    },
+    saveStep2() {
+      this.step2Data.forEach((data) => {
+        let obj = {};
+        let url = data.oid ? data.oid : 0;
+        console.log(data);
+        obj.pcid = data.prid ? data.prid : data.id;
+        obj.p_id = this.pro;
+        obj.idx = this.step2Data.indexOf(data);
+        axiosPost(`/orderProcess/${url}`, obj);
+      });
     },
   },
 };
@@ -118,7 +173,6 @@ export default {
   line-height: 6vh;
   float: left;
   color: white;
-  font-size: 1.2rem;
   background-color: #6f00cc;
   border-radius: 0 0.8vh 0.8vh 0;
   cursor: pointer;
