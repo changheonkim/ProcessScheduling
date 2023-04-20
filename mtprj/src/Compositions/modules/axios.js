@@ -18,7 +18,7 @@ function axiosGet(URL, onSucess = null, onFailed = null) {
   });
 }
 
-function axiosPost(URL, data) {
+function axiosPostOrderProcess(URL, data) {
   const final_URL = BASE_URL + URL;
   console.log(data);
   axios
@@ -26,6 +26,27 @@ function axiosPost(URL, data) {
       pc_id: data.pcid,
       p_id: data.p_id,
       idx: data.idx,
+    })
+    .then((resp) => {
+      if (resp.status == 200) {
+        console.log(resp);
+      } else {
+        console.log(resp);
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
+function axiosPostMachine(URL, data) {
+  const final_URL = BASE_URL + URL;
+  console.log(data);
+  axios
+    .post(final_URL, {
+      mname: data.mname,
+      pc_id: data.pc_id,
+      o_id: data.o_id,
     })
     .then((resp) => {
       if (resp.status == 200) {
@@ -55,4 +76,4 @@ function axiosDelete(URL) {
     });
 }
 
-export { axiosGet, axiosPost, axiosDelete };
+export { axiosGet, axiosPostOrderProcess, axiosDelete, axiosPostMachine };

@@ -17,7 +17,7 @@
       <div class="save-todo" v-on:click="saveStep2">공정 저장</div>
     </div>
     <div class="todo-list-bar">
-      <div class="category">카테고리 추가</div>
+      <div class="category" v-on:click="saveStep3">최종 공정 저장</div>
       <div class="title">Todo <span style="color: #6f00cc">List</span></div>
       <div class="calendar-button">캘린더</div>
     </div>
@@ -35,7 +35,11 @@
 import DargMainVue from "./TodoFolder/DargMain.vue";
 import { computed, onMounted, ref } from "vue";
 import { useStore } from "vuex";
-import { axiosGet, axiosPost } from "./modules/axios.js";
+import {
+  axiosGet,
+  axiosPostMachine,
+  axiosPostOrderProcess,
+} from "./modules/axios.js";
 export default {
   components: {
     DargMainVue,
@@ -76,23 +80,50 @@ export default {
     setSelectPro(event) {
       this.pro = event.target.value;
     },
+    saveStep3() {
+      let url = 0;
+      let obj = {};
+      this.step3List.forEach((data) => {
+        obj.mname = data.name;
+        obj.pc_id = this.pro;
+        data.items.forEach((d) => {
+          obj.o_id = d.oid;
+          console.log(obj);
+          url = d.id ? d.id : url;
+          axiosPostMachine(`/machine/${url}`, obj);
+          url = 0;
+        });
+      });
+      alert("step3 저장 성공");
+    },
     getStep2() {
       if (this.com != "" && this.pro != "") {
         let url = "/orderProcess/" + this.pro + "/" + this.com;
         console.log("pro:" + this.pro, this.com);
-        axiosGet(url, (data) => {
-          this.category = [];
-          this.step3List = [];
 
-          let mnames = new Set();
+        axiosGet(url, (data) => {
+          this.Step2Data = [];
+          console.log(data);
+          this.store.dispatch("setStep2Data", data);
+        });
+
+        this.category = [];
+        this.step3List = [];
+        let mnames = new Set();
+
+        url = "/machine/" + this.pro;
+
+        axiosGet(url, (data) => {
+          console.log(data);
+
           data.forEach((element) => {
-            mnames.add(element.mname);
+            if (element.mname != null) {
+              mnames.add(element.mname);
+            }
           });
 
           let idx = 0;
           mnames.forEach((mn) => {
-            idx++;
-
             let step3 = {};
             step3.index = idx;
             step3.name = mn;
@@ -102,23 +133,34 @@ export default {
             let obj = {};
             obj.name = mn;
             this.category.push(obj);
+
+            idx++;
           });
 
           data.forEach((element) => {
             let idx = 0;
             this.step3List.forEach((list) => {
               let obj = {};
-              if (element.mname == list.name && element.mname != null) {
-                obj.name = element.job;
-                this.step3List[idx].items.push(obj);
-              }
+              this.step2Data.forEach((el) => {
+                if (
+                  (element.mname == list.name) &
+                  (element.orderProcess != null)
+                ) {
+                  if (element.orderProcess.id == el.oid) {
+                    obj.job = el.job;
+                    obj.oid = element.orderProcess.id;
+                    obj.id = el.mid;
+                    obj.schedule = element.schedule;
+                    this.step3List[idx].items.push(obj);
+                  }
+                }
+              });
               idx++;
             });
           });
 
-          this.Step2Data = [];
-          console.log(data);
-          this.store.dispatch("setStep2Data", data);
+          console.log(this.step3List);
+          alert("조회 성공");
         });
       } else {
         alert("회사와 제품을 선택하세요!");
@@ -128,12 +170,12 @@ export default {
       this.step2Data.forEach((data) => {
         let obj = {};
         let url = data.oid ? data.oid : 0;
-        console.log(data);
         obj.pcid = data.prid ? data.prid : data.id;
         obj.p_id = this.pro;
         obj.idx = this.step2Data.indexOf(data);
-        axiosPost(`/orderProcess/${url}`, obj);
+        axiosPostOrderProcess(`/orderProcess/${url}`, obj);
       });
+      alert("step2 저장 성공, 새로고침 후 step3 등록 요망");
     },
   },
 };

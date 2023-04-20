@@ -18,6 +18,8 @@ public class Machine {
     private long id;
     private String mname;
 
+    private java.sql.Date schedule;
+
     @ManyToOne
     @JoinColumn(name = "pc_id")
     @JsonManagedReference
@@ -27,7 +29,7 @@ public class Machine {
     @JoinColumn(name = "o_id")
     @JsonManagedReference
     private OrderProcess orderProcess;
-    @JsonBackReference
-    @OneToMany(mappedBy = "machine", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Schedule> schedule;
+//    @JsonBackReference
+//    @OneToMany(mappedBy = "machine", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+//    private List<Schedule> schedule;
 }

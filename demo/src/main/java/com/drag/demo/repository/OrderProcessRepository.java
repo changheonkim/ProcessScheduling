@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface OrderProcessRepository extends JpaRepository<OrderProcess, Long> {
-    @Query(value = "select cname, pname, idx, mname, p2.id as prid ,job, o.id as oid, category from product p " +
+    @Query(value = "select cname, pname, idx, mname, p2.id as prid ,job, o.id as oid, m.id as mid, category from product p " +
             "left join company c on c.id = p.c_id " +
             "left join order_process o on o.pc_id = p.id " +
             "left join process p2 on p2.id = o.p_id " +

@@ -40,10 +40,20 @@
       <div :list="step3List" class="step3-border">
         <div v-for="row in step3List" :key="row.index" class="layout">
           <div>
-            <draggable :list="row.items" group="people" itemKey="name">
-              <template #item="{ element }">
-                <div v-if="element.name != null" class="st3-do">
-                  {{ element.name }}
+            <draggable
+              :list="row.items"
+              group="people"
+              itemKey="name"
+              @change="log"
+            >
+              <template #item="{ element, index }">
+                <div v-if="element.job != null" class="st3-do">
+                  {{ element.job }}
+                  <span
+                    class="del_button"
+                    v-on:click="delStep3(row.index, index)"
+                    >X</span
+                  >
                 </div>
               </template>
             </draggable>
@@ -84,6 +94,17 @@ export default {
       } else {
         this.step2Data.splice(idx, 1);
       }
+    },
+    delStep3(key, idx) {
+      if (this.step3List[key].items[idx].id != 0) {
+        axiosDelete(`/machine/${this.step3List[key].items[idx].id}`);
+        this.step3List[key].items.splice(idx, 1);
+      } else {
+        this.step3List[key].items.splice(idx, 1);
+      }
+    },
+    log() {
+      console.log(this.step3List);
     },
   },
   data() {
